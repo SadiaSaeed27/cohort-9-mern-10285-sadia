@@ -96,6 +96,16 @@ const forgotPassword = async (req, res, next) => {
     const clientUrl = (process.env.CLIENT_URL || "http://localhost:5173")
       .split(",")[0]
       .trim();
+
+    if (
+      process.env.NODE_ENV === "production" &&
+      !clientUrl.startsWith("https://")
+    ) {
+      return res.status(500).json({
+        success: false,
+        message: "Password reset service is not configured securely",
+      });
+    }
     const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
 
     try {
