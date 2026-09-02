@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useRef } from "react";
 
 const COLOR_MAP = {
   yellow: "#fff9c4",
@@ -27,10 +27,40 @@ const getRelativeTime = (dateString) => {
 };
 
 const NoteViewModal = ({ isOpen, onClose, note }) => {
+  const dialogRef = useRef(null);
+  const previousFocusRef = useRef(null);
+
   const handleKeyDown = useCallback(
     (e) => {
       if (e.key === "Escape") {
         onClose();
+        return;
+      }
+
+      if (e.key !== "Tab" || !dialogRef.current) return;
+
+      const focusableElements = dialogRef.current.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+
+      if (focusableElements.length === 0) {
+        e.preventDefault();
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement =
+        focusableElements[focusableElements.length - 1];
+
+      if (e.shiftKey && document.activeElement === firstElement) {
+        e.preventDefault();
+        lastElement.focus();
+      } else if (
+        !e.shiftKey &&
+        document.activeElement === lastElement
+      ) {
+        e.preventDefault();
+        firstElement.focus();
       }
     },
     [onClose],
@@ -38,13 +68,27 @@ const NoteViewModal = ({ isOpen, onClose, note }) => {
 
   useEffect(() => {
     if (isOpen) {
+      previousFocusRef.current = document.activeElement;
+
       document.addEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "hidden";
+
+      requestAnimationFrame(() => {
+        const firstFocusable =
+          dialogRef.current?.querySelector(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+          );
+
+        firstFocusable?.focus();
+      });
     }
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
+
+      previousFocusRef.current?.focus();
+      previousFocusRef.current = null;
     };
   }, [isOpen, handleKeyDown]);
 
@@ -61,6 +105,7 @@ const NoteViewModal = ({ isOpen, onClose, note }) => {
       aria-label="View note"
     >
       <div
+        ref={dialogRef}
         onClick={(e) => e.stopPropagation()}
         className="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
       >
@@ -101,35 +146,35 @@ const NoteViewModal = ({ isOpen, onClose, note }) => {
 
         {/* Note content */}
         <div className="note-content min-h-0 overflow-y-auto overflow-x-hidden px-6 py-6">
-  {note.content ? (
-    <div
-      className="min-w-0 max-w-full break-words text-sm leading-relaxed text-gray-800"
-      dangerouslySetInnerHTML={{ __html: note.content }}
-    />
-  ) : (
-    <p className="text-sm italic text-gray-500">
-      This note is empty.
-    </p>
-  )}
-</div>
+          {note.content ? (
+            <div
+              className="min-w-0 max-w-full break-words text-sm leading-relaxed text-gray-800"
+              dangerouslySetInnerHTML={{ __html: note.content }}
+            />
+          ) : (
+            <p className="text-sm italic text-gray-500">
+              This note is empty.
+            </p>
+          )}
+        </div>
 
         {/* Footer */}
-<div className="flex items-center justify-between border-t border-gray-200 px-6 py-4">
-  <time
-    className="text-xs text-gray-500"
-    dateTime={note.createdAt}
-  >
-    Created {getRelativeTime(note.createdAt)}
-  </time>
+        <div className="flex items-center justify-between border-t border-gray-200 px-6 py-4">
+          <time
+            className="text-xs text-gray-500"
+            dateTime={note.createdAt}
+          >
+            Created {getRelativeTime(note.createdAt)}
+          </time>
 
-  <button
-    type="button"
-    onClick={onClose}
-    className="cursor-pointer rounded-lg bg-gray-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800"
-  >
-    Close
-  </button>
-</div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="cursor-pointer rounded-lg bg-gray-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800"
+          >
+            Close
+          </button>
+        </div>
       </div>
     </div>
   );

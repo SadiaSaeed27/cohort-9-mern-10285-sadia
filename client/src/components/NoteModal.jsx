@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import ColorPicker from "./ColorPicker";
@@ -29,6 +29,9 @@ const NoteModal = ({ isOpen, onClose, note, onSave }) => {
   const [tagInput, setTagInput] = useState("");
   const [titleError, setTitleError] = useState(false);
 
+  const dialogRef = useRef(null);
+  const previousFocusRef = useRef(null);
+
   const isEditMode = Boolean(note);
 
   useEffect(() => {
@@ -44,20 +47,47 @@ const NoteModal = ({ isOpen, onClose, note, onSave }) => {
 
   const handleKeyDown = useCallback(
     (e) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+
+      if (e.key === "Tab" && dialogRef.current) {
+        const focusableElements = dialogRef.current.querySelectorAll(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        );
+
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey && document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
     },
     [onClose],
   );
 
   useEffect(() => {
-    if (isOpen) {
-      document.addEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "hidden";
-    }
+    if (!isOpen) return;
+
+    previousFocusRef.current = document.activeElement;
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
+
+      previousFocusRef.current?.focus();
+      previousFocusRef.current = null;
     };
   }, [isOpen, handleKeyDown]);
 
@@ -120,6 +150,7 @@ const NoteModal = ({ isOpen, onClose, note, onSave }) => {
       aria-label={isEditMode ? "Edit note" : "Create note"}
     >
       <form
+        ref={dialogRef}
         onClick={(e) => e.stopPropagation()}
         onSubmit={handleSubmit}
         className="flex w-full max-w-lg flex-col gap-5 rounded-2xl bg-white p-6 text-gray-900 shadow-xl dark:bg-slate-900 dark:text-slate-100"

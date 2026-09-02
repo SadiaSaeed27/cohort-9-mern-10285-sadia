@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useRef } from "react";
 
 const ConfirmDialog = ({
   isOpen,
@@ -10,21 +10,60 @@ const ConfirmDialog = ({
   cancelText = "Cancel",
   loading = false,
 }) => {
+  const dialogRef = useRef(null);
+  const previousFocusRef = useRef(null);
+
   const handleKeyDown = useCallback(
     (e) => {
-      if (e.key === "Escape" && !loading) onClose();
+      if (e.key === "Escape" && !loading) {
+        onClose();
+        return;
+      }
+
+      if (e.key === "Tab" && dialogRef.current) {
+        const focusableElements = dialogRef.current.querySelectorAll(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        );
+
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey && document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
     },
     [onClose, loading],
   );
 
   useEffect(() => {
-    if (isOpen) {
-      document.addEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "hidden";
-    }
+    if (!isOpen) return;
+
+    previousFocusRef.current = document.activeElement;
+
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", handleKeyDown);
+
+    requestAnimationFrame(() => {
+      const firstFocusableElement = dialogRef.current?.querySelector(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+
+      firstFocusableElement?.focus();
+    });
+
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
+
+      previousFocusRef.current?.focus();
+      previousFocusRef.current = null;
     };
   }, [isOpen, handleKeyDown]);
 
@@ -40,6 +79,7 @@ const ConfirmDialog = ({
       aria-describedby="confirm-message"
     >
       <div
+        ref={dialogRef}
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl"
       >
@@ -54,10 +94,7 @@ const ConfirmDialog = ({
             >
               {title}
             </h3>
-            <p
-              id="confirm-message"
-              className="mt-1 text-sm text-gray-500"
-            >
+            <p id="confirm-message" className="mt-1 text-sm text-gray-500">
               {message}
             </p>
           </div>
