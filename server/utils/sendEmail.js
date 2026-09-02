@@ -14,12 +14,22 @@ const createTransporter = () =>
 const sendEmail = async ({ to, subject, html }) => {
   const transporter = createTransporter();
 
-  await transporter.sendMail({
-    from: `"Notes App" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
-    to,
-    subject,
-    html,
-  });
+  try {
+    await transporter.sendMail({
+      from: `"Notes App" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+      to,
+      subject,
+      html,
+    });
+  } catch (error) {
+    console.error("Password reset email delivery failed", {
+      to,
+      subject,
+      error: error.message,
+    });
+
+    throw error;
+  }
 };
 
 const buildResetEmailHtml = (userName, resetUrl) => `
