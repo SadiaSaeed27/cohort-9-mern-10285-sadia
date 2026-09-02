@@ -10,9 +10,7 @@ const sortNotes = (notes) =>
   });
 
 const sortArchivedNotes = (notes) =>
-  [...notes].sort(
-    (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
-  );
+  [...notes].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
 const useNotes = () => {
   const [notes, setNotes] = useState([]);
@@ -32,9 +30,7 @@ const useNotes = () => {
 
       setNotes(data.notes);
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Failed to fetch notes",
-      );
+      toast.error(error.response?.data?.message || "Failed to fetch notes");
     } finally {
       setLoading(false);
     }
@@ -49,9 +45,7 @@ const useNotes = () => {
 
       setArchivedNotes(data.notes);
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Failed to fetch archive",
-      );
+      toast.error(error.response?.data?.message || "Failed to fetch archive");
     } finally {
       setArchiveLoading(false);
     }
@@ -66,9 +60,7 @@ const useNotes = () => {
 
       setTrashNotes(data.notes);
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Failed to fetch trash",
-      );
+      toast.error(error.response?.data?.message || "Failed to fetch trash");
     } finally {
       setTrashLoading(false);
     }
@@ -84,16 +76,12 @@ const useNotes = () => {
     // Note created
     const handleNoteCreated = (createdNote) => {
       setNotes((prev) => {
-        const exists = prev.some(
-          (note) => note._id === createdNote._id,
-        );
+        const exists = prev.some((note) => note._id === createdNote._id);
 
         if (exists) {
           return sortNotes(
             prev.map((note) =>
-              note._id === createdNote._id
-                ? createdNote
-                : note,
+              note._id === createdNote._id ? createdNote : note,
             ),
           );
         }
@@ -112,28 +100,18 @@ const useNotes = () => {
     const handleNoteUpdated = (updatedNote) => {
       // Trashed note
       if (updatedNote.isTrashed) {
-        setNotes((prev) =>
-          prev.filter(
-            (note) => note._id !== updatedNote._id,
-          ),
-        );
+        setNotes((prev) => prev.filter((note) => note._id !== updatedNote._id));
 
         setArchivedNotes((prev) =>
-          prev.filter(
-            (note) => note._id !== updatedNote._id,
-          ),
+          prev.filter((note) => note._id !== updatedNote._id),
         );
 
         setTrashNotes((prev) => {
-          const exists = prev.some(
-            (note) => note._id === updatedNote._id,
-          );
+          const exists = prev.some((note) => note._id === updatedNote._id);
 
           if (exists) {
             return prev.map((note) =>
-              note._id === updatedNote._id
-                ? updatedNote
-                : note,
+              note._id === updatedNote._id ? updatedNote : note,
             );
           }
 
@@ -145,37 +123,24 @@ const useNotes = () => {
 
       // Archived note
       if (updatedNote.isArchived) {
-        setNotes((prev) =>
-          prev.filter(
-            (note) => note._id !== updatedNote._id,
-          ),
-        );
+        setNotes((prev) => prev.filter((note) => note._id !== updatedNote._id));
 
         setTrashNotes((prev) =>
-          prev.filter(
-            (note) => note._id !== updatedNote._id,
-          ),
+          prev.filter((note) => note._id !== updatedNote._id),
         );
 
         setArchivedNotes((prev) => {
-          const exists = prev.some(
-            (note) => note._id === updatedNote._id,
-          );
+          const exists = prev.some((note) => note._id === updatedNote._id);
 
           if (exists) {
             return sortArchivedNotes(
               prev.map((note) =>
-                note._id === updatedNote._id
-                  ? updatedNote
-                  : note,
+                note._id === updatedNote._id ? updatedNote : note,
               ),
             );
           }
 
-          return sortArchivedNotes([
-            updatedNote,
-            ...prev,
-          ]);
+          return sortArchivedNotes([updatedNote, ...prev]);
         });
 
         return;
@@ -183,28 +148,20 @@ const useNotes = () => {
 
       // Active note
       setArchivedNotes((prev) =>
-        prev.filter(
-          (note) => note._id !== updatedNote._id,
-        ),
+        prev.filter((note) => note._id !== updatedNote._id),
       );
 
       setTrashNotes((prev) =>
-        prev.filter(
-          (note) => note._id !== updatedNote._id,
-        ),
+        prev.filter((note) => note._id !== updatedNote._id),
       );
 
       setNotes((prev) => {
-        const exists = prev.some(
-          (note) => note._id === updatedNote._id,
-        );
+        const exists = prev.some((note) => note._id === updatedNote._id);
 
         if (exists) {
           return sortNotes(
             prev.map((note) =>
-              note._id === updatedNote._id
-                ? updatedNote
-                : note,
+              note._id === updatedNote._id ? updatedNote : note,
             ),
           );
         }
@@ -215,17 +172,11 @@ const useNotes = () => {
 
     // Note permanently deleted
     const handleNoteDeleted = ({ noteId }) => {
-      setNotes((prev) =>
-        prev.filter((note) => note._id !== noteId),
-      );
+      setNotes((prev) => prev.filter((note) => note._id !== noteId));
 
-      setArchivedNotes((prev) =>
-        prev.filter((note) => note._id !== noteId),
-      );
+      setArchivedNotes((prev) => prev.filter((note) => note._id !== noteId));
 
-      setTrashNotes((prev) =>
-        prev.filter((note) => note._id !== noteId),
-      );
+      setTrashNotes((prev) => prev.filter((note) => note._id !== noteId));
     };
 
     socket.on("note:created", handleNoteCreated);
@@ -241,79 +192,53 @@ const useNotes = () => {
   }, []);
 
   // Create note
-  const createNote = useCallback(
-    async ({ title, content, color, tags }) => {
-      const { data } = await axiosInstance.post("/notes", {
+  const createNote = useCallback(async ({ title, content, color, tags }) => {
+    const { data } = await axiosInstance.post("/notes", {
+      title,
+      content,
+      color,
+      tags,
+    });
+
+    setNotes((prev) => {
+      const exists = prev.some((note) => note._id === data.note._id);
+
+      if (exists) {
+        return sortNotes(
+          prev.map((note) => (note._id === data.note._id ? data.note : note)),
+        );
+      }
+
+      return sortNotes([data.note, ...prev]);
+    });
+
+    toast.success("Note created");
+  }, []);
+
+  // Update note
+  const updateNote = useCallback(
+    async (noteId, { title, content, color, tags }) => {
+      const { data } = await axiosInstance.put(`/notes/${noteId}`, {
         title,
         content,
         color,
         tags,
       });
 
-      setNotes((prev) => {
-        const exists = prev.some(
-          (note) => note._id === data.note._id,
-        );
-
-        if (exists) {
-          return sortNotes(
-            prev.map((note) =>
-              note._id === data.note._id
-                ? data.note
-                : note,
-            ),
-          );
-        }
-
-        return sortNotes([data.note, ...prev]);
-      });
-
-      toast.success("Note created");
-    },
-    [],
-  );
-
-  // Update note
-  const updateNote = useCallback(
-    async (noteId, { title, content, color, tags }) => {
-      const { data } = await axiosInstance.put(
-        `/notes/${noteId}`,
-        {
-          title,
-          content,
-          color,
-          tags,
-        },
-      );
-
       const updatedNote = data.note;
 
-      if (
-        !updatedNote.isArchived &&
-        !updatedNote.isTrashed
-      ) {
+      if (!updatedNote.isArchived && !updatedNote.isTrashed) {
         setNotes((prev) =>
           sortNotes(
-            prev.map((note) =>
-              note._id === noteId
-                ? updatedNote
-                : note,
-            ),
+            prev.map((note) => (note._id === noteId ? updatedNote : note)),
           ),
         );
       }
 
-      if (
-        updatedNote.isArchived &&
-        !updatedNote.isTrashed
-      ) {
+      if (updatedNote.isArchived && !updatedNote.isTrashed) {
         setArchivedNotes((prev) =>
           sortArchivedNotes(
-            prev.map((note) =>
-              note._id === noteId
-                ? updatedNote
-                : note,
-            ),
+            prev.map((note) => (note._id === noteId ? updatedNote : note)),
           ),
         );
       }
@@ -325,61 +250,39 @@ const useNotes = () => {
 
   // Archive note
   const archiveNote = useCallback(async (noteId) => {
-    const { data } = await axiosInstance.patch(
-      `/notes/${noteId}/archive`,
-    );
+    const { data } = await axiosInstance.patch(`/notes/${noteId}/archive`);
 
-    setNotes((prev) =>
-      prev.filter((note) => note._id !== noteId),
-    );
+    setNotes((prev) => prev.filter((note) => note._id !== noteId));
 
-    setArchivedNotes((prev) =>
-      sortArchivedNotes([data.note, ...prev]),
-    );
+    setArchivedNotes((prev) => sortArchivedNotes([data.note, ...prev]));
 
     toast.success("Note archived");
   }, []);
 
   // Unarchive note
   const unarchiveNote = useCallback(async (noteId) => {
-    const { data } = await axiosInstance.patch(
-      `/notes/${noteId}/unarchive`,
-    );
+    const { data } = await axiosInstance.patch(`/notes/${noteId}/unarchive`);
 
-    setArchivedNotes((prev) =>
-      prev.filter((note) => note._id !== noteId),
-    );
+    setArchivedNotes((prev) => prev.filter((note) => note._id !== noteId));
 
-    setNotes((prev) =>
-      sortNotes([data.note, ...prev]),
-    );
+    setNotes((prev) => sortNotes([data.note, ...prev]));
 
     toast.success("Note unarchived");
   }, []);
 
   // Move note to trash
   const deleteNote = useCallback(async (noteId) => {
-    const { data } = await axiosInstance.patch(
-      `/notes/${noteId}/trash`,
-    );
+    const { data } = await axiosInstance.patch(`/notes/${noteId}/trash`);
 
-    setNotes((prev) =>
-      prev.filter((note) => note._id !== noteId),
-    );
+    setNotes((prev) => prev.filter((note) => note._id !== noteId));
 
-    setArchivedNotes((prev) =>
-      prev.filter((note) => note._id !== noteId),
-    );
+    setArchivedNotes((prev) => prev.filter((note) => note._id !== noteId));
 
     setTrashNotes((prev) => {
-      const exists = prev.some(
-        (note) => note._id === noteId,
-      );
+      const exists = prev.some((note) => note._id === noteId);
 
       if (exists) {
-        return prev.map((note) =>
-          note._id === noteId ? data.note : note,
-        );
+        return prev.map((note) => (note._id === noteId ? data.note : note));
       }
 
       return [data.note, ...prev];
@@ -390,56 +293,35 @@ const useNotes = () => {
 
   // Restore note from trash
   const restoreNote = useCallback(async (noteId) => {
-    const { data } = await axiosInstance.patch(
-      `/notes/${noteId}/restore`,
-    );
+    const { data } = await axiosInstance.patch(`/notes/${noteId}/restore`);
 
-    setTrashNotes((prev) =>
-      prev.filter((note) => note._id !== noteId),
-    );
+    setTrashNotes((prev) => prev.filter((note) => note._id !== noteId));
 
     setNotes((prev) =>
-      sortNotes([data.note, ...prev]),
+      sortNotes([data.note, ...prev.filter((note) => note._id !== noteId)]),
     );
 
     toast.success("Note restored");
   }, []);
 
   // Permanently delete note
-  const permanentlyDeleteNote = useCallback(
-    async (noteId) => {
-      await axiosInstance.delete(
-        `/notes/${noteId}/permanent`,
-      );
+  const permanentlyDeleteNote = useCallback(async (noteId) => {
+    await axiosInstance.delete(`/notes/${noteId}/permanent`);
 
-      setTrashNotes((prev) =>
-        prev.filter((note) => note._id !== noteId),
-      );
+    setTrashNotes((prev) => prev.filter((note) => note._id !== noteId));
 
-      toast.success("Note permanently deleted");
-    },
-    [],
-  );
+    toast.success("Note permanently deleted");
+  }, []);
 
   // Toggle pin
   const togglePin = useCallback(async (noteId) => {
-    const { data } = await axiosInstance.patch(
-      `/notes/${noteId}/pin`,
-    );
+    const { data } = await axiosInstance.patch(`/notes/${noteId}/pin`);
 
     setNotes((prev) =>
-      sortNotes(
-        prev.map((note) =>
-          note._id === noteId ? data.note : note,
-        ),
-      ),
+      sortNotes(prev.map((note) => (note._id === noteId ? data.note : note))),
     );
 
-    toast.success(
-      data.note.isPinned
-        ? "Note pinned"
-        : "Note unpinned",
-    );
+    toast.success(data.note.isPinned ? "Note pinned" : "Note unpinned");
   }, []);
 
   return {
