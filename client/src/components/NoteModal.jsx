@@ -12,13 +12,7 @@ const QUILL_MODULES = {
   ],
 };
 
-const QUILL_FORMATS = [
-  "bold",
-  "italic",
-  "underline",
-  "list",
-  "link",
-];
+const QUILL_FORMATS = ["bold", "italic", "underline", "list", "link"];
 
 const NoteModal = ({ isOpen, onClose, note, onSave }) => {
   const [title, setTitle] = useState("");
@@ -108,9 +102,7 @@ const NoteModal = ({ isOpen, onClose, note, onSave }) => {
   };
 
   const handleRemoveTag = (tagToRemove) => {
-    setTags((prevTags) =>
-      prevTags.filter((tag) => tag !== tagToRemove),
-    );
+    setTags((prevTags) => prevTags.filter((tag) => tag !== tagToRemove));
   };
 
   const handleSubmit = async (e) => {
@@ -134,6 +126,8 @@ const NoteModal = ({ isOpen, onClose, note, onSave }) => {
       });
 
       onClose();
+    } catch {
+      // The parent handles the actual API error.
     } finally {
       setSaving(false);
     }
@@ -193,9 +187,7 @@ const NoteModal = ({ isOpen, onClose, note, onSave }) => {
           />
 
           {titleError && (
-            <p className="mt-1 text-xs text-red-500">
-              Title is required
-            </p>
+            <p className="mt-1 text-xs text-red-500">Title is required</p>
           )}
         </div>
 
@@ -217,10 +209,7 @@ const NoteModal = ({ isOpen, onClose, note, onSave }) => {
             Color:
           </span>
 
-          <ColorPicker
-            selectedColor={color}
-            onSelect={setColor}
-          />
+          <ColorPicker selectedColor={color} onSelect={setColor} />
         </div>
 
         {/* Tags */}
@@ -236,7 +225,6 @@ const NoteModal = ({ isOpen, onClose, note, onSave }) => {
                 className="flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700 dark:bg-slate-800 dark:text-slate-200"
               >
                 #{tag}
-
                 <button
                   type="button"
                   onClick={() => handleRemoveTag(tag)}
@@ -274,11 +262,7 @@ const NoteModal = ({ isOpen, onClose, note, onSave }) => {
             disabled={saving}
             className="cursor-pointer rounded-lg bg-gray-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-slate-200"
           >
-            {saving
-              ? "Saving…"
-              : isEditMode
-                ? "Update"
-                : "Create"}
+            {saving ? "Saving…" : isEditMode ? "Update" : "Create"}
           </button>
         </div>
       </form>
