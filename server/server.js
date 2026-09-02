@@ -1,0 +1,190 @@
+require("dotenv").config();
+
+const http = require("http");
+
+const app = require("./app");
+const connectDB = require("./config/db");
+const initializeSocket = require("./config/socket");
+const logger = require("./utils/logger");
+const { version } = require("./package.json");
+
+const PORT = process.env.PORT || 5000;
+
+const server = http.createServer(app);
+
+const io = initializeSocket(server);
+
+// Make Socket.IO accessible inside Express controllers
+app.set("io", io);
+
+// ── Welcome Page (production landing)
+app.get("/", (_req, res) => {
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes MERN API</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle, rgba(234,179,8,.06) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      top: 10%;
+      left: 6%;
+      width: 20px;
+      height: 24px;
+      border: 2px solid rgba(250,204,21,.2);
+      border-radius: 3px;
+      transform: rotate(-8deg);
+      pointer-events: none;
+      box-shadow:
+        60vw 8vh 0 0 rgba(253,224,71,.15),
+        20vw 65vh 0 0 rgba(250,204,21,.12),
+        78vw 50vh 0 0 rgba(253,224,71,.10),
+        40vw 25vh 0 0 rgba(250,204,21,.08),
+        88vw 75vh 0 0 rgba(253,224,71,.12);
+    }
+
+    .container {
+      position: relative;
+      text-align: center;
+      padding: 3rem 2.5rem;
+      max-width: 460px;
+      width: 90%;
+      background: rgba(30,41,59,.7);
+      border: 1px solid rgba(250,204,21,.15);
+      border-radius: 20px;
+      backdrop-filter: blur(12px);
+      box-shadow:
+        0 0 60px rgba(250,204,21,.04),
+        0 25px 50px rgba(0,0,0,.35);
+    }
+
+    .icon { font-size: 2.5rem; margin-bottom: 1rem; }
+
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      background: linear-gradient(135deg, #fde68a, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .divider {
+      width: 48px;
+      height: 2px;
+      margin: 1.5rem auto;
+      background: linear-gradient(90deg, transparent, #f59e0b, transparent);
+      border-radius: 2px;
+    }
+
+    .status { font-size: .95rem; color: #94a3b8; line-height: 1.6; }
+    .status strong { color: #fbbf24; }
+
+    .sign {
+      margin-top: 2rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid rgba(250,204,21,.1);
+      font-size: .78rem;
+      color: #64748b;
+    }
+    .sign a { color: #fbbf24; text-decoration: none; transition: color .2s ease; }
+    .sign a:hover { color: #fde68a; }
+
+    .version { margin-top: .5rem; font-size: .85rem; color: #94a3b8; letter-spacing: .04em; }
+
+    .links { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; margin-top: .5rem; }
+
+    .btn {
+      display: inline-block;
+      padding: .6rem 1.4rem;
+      border-radius: 10px;
+      font-size: .85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all .25s ease;
+    }
+
+    .btn-secondary {
+      background: rgba(250,204,21,.1);
+      color: #fbbf24;
+      border: 1px solid rgba(250,204,21,.2);
+    }
+    .btn-secondary:hover {
+      background: rgba(250,204,21,.18);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 2rem 1.5rem; }
+      h1 { font-size: 1.5rem; }
+      .links { flex-direction: column; }
+      .btn { width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">📝</div>
+    <h1>Notes MERN API</h1>
+    <p class="version">v${version}</p>
+    <div class="divider"></div>
+    <p class="status">API is <strong>running</strong> and ready for requests.</p>
+    <div class="links">
+      <a href="/api/health" class="btn btn-secondary">Health Check</a>
+    </div>
+    <footer class="sign">
+      Created by
+      <a href="https://serkanbayraktar.com/" target="_blank" rel="noopener noreferrer">Serkanby</a>
+      |
+      <a href="https://github.com/Serkanbyx" target="_blank" rel="noopener noreferrer">Github</a>
+    </footer>
+  </div>
+</body>
+</html>`);
+});
+
+// ── Start Server
+const startServer = async () => {
+  await connectDB();
+
+  server.listen(PORT, () => {
+  logger.info(
+    {
+      port: PORT,
+      environment: process.env.NODE_ENV,
+    },
+    "Server started",
+  );
+});
+};
+
+startServer().catch((error) => {
+  logger.fatal({ err: error }, "Failed to start server");
+  process.exit(1);
+});

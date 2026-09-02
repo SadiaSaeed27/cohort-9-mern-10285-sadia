@@ -1,0 +1,144 @@
+@import 'tailwindcss';
+@custom-variant dark (&:where(.dark, .dark *));
+/* React Quill editor overrides inside NoteModal */
+
+.note-editor .ql-container {
+  min-height: 140px;
+  max-height: 280px;
+  overflow-y: auto;
+  font-size: 14px;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+}
+
+.note-editor .ql-toolbar {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+.note-editor .ql-editor.ql-blank::before {
+  font-style: normal;
+  color: #9ca3af;
+}
+
+/* Full note view */
+
+.note-content p {
+  margin-bottom: 0.75rem;
+}
+
+.note-content p:last-child {
+  margin-bottom: 0;
+}
+
+.note-content strong {
+  font-weight: 700;
+}
+
+.note-content em {
+  font-style: italic;
+}
+
+.note-content u {
+  text-decoration: underline;
+}
+
+.note-content ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.note-content ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.note-content li {
+  margin-bottom: 0.25rem;
+}
+
+.note-content a {
+  text-decoration: underline;
+}
+
+/* Homepage note preview */
+
+.note-preview p {
+  margin-bottom: 0.35rem;
+}
+
+.note-preview p:last-child {
+  margin-bottom: 0;
+}
+
+.note-preview strong {
+  font-weight: 700;
+}
+
+.note-preview em {
+  font-style: italic;
+}
+
+.note-preview u {
+  text-decoration: underline;
+}
+
+.note-preview ul {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+}
+
+.note-preview ol {
+  list-style-type: decimal;
+  padding-left: 1.25rem;
+}
+
+.note-preview li {
+  margin-bottom: 0.15rem;
+}
+
+.note-preview a {
+  text-decoration: underline;
+}
+
+.note-content h1,
+.note-content h2,
+.note-content h3,
+.note-content h4 {
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.note-content blockquote {
+  border-left: 3px solid #d1d5db;
+  padding-left: 1rem;
+  margin: 0.75rem 0;
+  color: #4b5563;
+}
+
+.note-preview blockquote {
+  border-left: 2px solid #d1d5db;
+  padding-left: 0.75rem;
+}
+
+.note-content {
+  overflow-wrap: anywhere;
+}
+
+.note-content img {
+  max-width: 100%;
+  height: auto;
+}
+
+.note-content pre {
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.note-content a {
+  overflow-wrap: anywhere;
+}
