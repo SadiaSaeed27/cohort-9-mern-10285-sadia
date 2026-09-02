@@ -54,9 +54,7 @@ const ProfilePage = () => {
 
       toast.success("Profile updated successfully");
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Failed to update profile",
-      );
+      toast.error(error.response?.data?.message || "Failed to update profile");
     } finally {
       setSaving(false);
     }
@@ -97,39 +95,32 @@ const ProfilePage = () => {
           </div>
 
           <div className="mt-4 text-center sm:mt-0 sm:text-left">
-            <h2 className="text-xl font-semibold text-gray-900">
-              {user.name}
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-900">{user.name}</h2>
 
-            <p className="mt-1 text-sm text-gray-500">
-              {user.email}
-            </p>
+            <p className="mt-1 text-sm text-gray-500">{user.email}</p>
           </div>
         </div>
 
         {/* Account information */}
         <div className="px-6 py-6">
-          
-
           {/* Name */}
           <div className="border-b border-gray-100 pb-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm font-medium text-[#0B1120]">
-                  Name
-                </p>
+                <p className="text-sm font-medium text-[#0B1120]">Name</p>
 
                 {!editing && (
-                  <p className="mt-1 text-sm text-gray-500">
-                    {user.name}
-                  </p>
+                  <p className="mt-1 text-sm text-gray-500">{user.name}</p>
                 )}
               </div>
 
               {!editing && (
                 <button
                   type="button"
-                  onClick={() => setEditing(true)}
+                  onClick={() => {
+                    setName(user.name);
+                    setEditing(true);
+                  }}
                   className="w-fit cursor-pointer rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
                 >
                   Edit
@@ -173,13 +164,9 @@ const ProfilePage = () => {
 
           {/* Email */}
           <div className="border-b border-gray-100 py-5">
-            <p className="text-sm font-medium text-[#0B1120] ">
-              Email
-            </p>
+            <p className="text-sm font-medium text-[#0B1120] ">Email</p>
 
-            <p className="mt-1 break-all text-sm text-gray-500">
-              {user.email}
-            </p>
+            <p className="mt-1 break-all text-sm text-gray-500">{user.email}</p>
 
             <p className="mt-1 text-xs text-gray-400">
               Email address cannot currently be changed.
@@ -189,19 +176,14 @@ const ProfilePage = () => {
           {/* Account created */}
           {user.createdAt && (
             <div className="py-5">
-              <p className="text-sm font-medium text-gray-700">
-                Member since
-              </p>
+              <p className="text-sm font-medium text-gray-700">Member since</p>
 
               <p className="mt-1 text-sm text-gray-500">
-                {new Date(user.createdAt).toLocaleDateString(
-                  undefined,
-                  {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  },
-                )}
+                {new Date(user.createdAt).toLocaleDateString(undefined, {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
               </p>
             </div>
           )}
