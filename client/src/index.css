@@ -2,6 +2,15 @@
 @custom-variant dark (&:where(.dark, .dark *));
 /* React Quill editor overrides inside NoteModal */
 
+.auth-page {
+  min-height: 100vh;
+  background-color: #ffffff;
+  background-image: url("../public/doddle.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 .note-editor .ql-container {
   min-height: 140px;
   max-height: 280px;
